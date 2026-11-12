@@ -11,8 +11,16 @@ fail() {
   exit 1
 }
 
-github_repo="$1"
-docker_image="$2"
+cleanup() {
+  rm -rf "$TEMP_DIR"
+}  
+
+TEMP_DIR="$(mktemp -d)"
+GITHUB_REPO="$1"
+DOCKER_IMAGE="$2"
+
+# Registers the cleanup function to be called on script exit
+trap cleanup EXIT
 
 # Repo name must consist of two parts divided by a "/" slash:
 # <user_name>/<repo_name>.
@@ -31,28 +39,26 @@ repo_name_correct() {
   case "$marker" in
     "github") exp="$github_exp" ;;
     "dockerhub") exp="$dockerhub_exp" ;;
-    *) echo "Error: wrong marker in $FUNCNAME"
-       return 1 ;;
+    *) return 1 ;;
   esac
 
   echo "$repo_name" | grep -qE "$exp"
 }
 
 # Check github and docker repository names are correct.
-repo_name_correct "$github_repo" "github" || fail "repo name '$github_repo' seems incorrect" 
-repo_name_correct "$docker_image" "dockerhub" || fail "repo name '$docker_image' seems incorrect"
+repo_name_correct "$GITHUB_REPO" "github" || fail "repo name '$GITHUB_REPO' seems incorrect" 
+repo_name_correct "$DOCKER_IMAGE" "dockerhub" || fail "repo name '$DOCKER_IMAGE' seems incorrect"
 
-repo_dir="$( echo $github_repo | cut -d/ -f2)"
-repo_url="https://github.com/$github_repo.git"
+repo_url="https://github.com/$GITHUB_REPO.git"
 
 # Clone repository
-output="$(git clone -q $repo_url 2>&1)"
+output="$(git clone -q $repo_url $TEMP_DIR 2>&1)"
 [ "$?" -eq 0 ] || fail "'git clone $repo_url': $output"
 
 # Build 
-output="$(docker build -t $docker_image "$repo_dir" 2>&1)"
-[ "$?" -eq 0 ] || fail "'docker build $repo_dir': $output"
+output="$(docker build -t $DOCKER_IMAGE "$TEMP_DIR" 2>&1)"
+[ "$?" -eq 0 ] || fail "'docker build -t $DOCKER_IMAGE $TEMP_DIR': $output"
 
 # Publish to dockerhub
-output="$(docker push $docker_image 2>&1)"
-[ "$?" -eq 0 ] || fail "'docker push $docker_image': $output"
+output="$(docker push $DOCKER_IMAGE 2>&1)"
+[ "$?" -eq 0 ] || fail "'docker push $DOCKER_IMAGE': $output"
