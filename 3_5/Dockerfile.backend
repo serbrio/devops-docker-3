@@ -6,6 +6,8 @@ ENV PORT=8080
 
 EXPOSE $PORT
 
+ENV REQUEST_ORIGIN=http://localhost:5001
+
 COPY code/example-backend ./
 
 RUN go mod download
