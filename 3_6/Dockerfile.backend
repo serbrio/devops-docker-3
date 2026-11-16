@@ -1,6 +1,6 @@
 FROM golang:1.16
 
-WORKDIR = /usr/src/app
+WORKDIR /usr/src/app
 
 ENV PORT=8080
 
