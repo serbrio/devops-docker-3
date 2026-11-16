@@ -49,9 +49,8 @@ repo_name_correct() {
 repo_name_correct "$GITHUB_REPO" "github" || fail "repo name '$GITHUB_REPO' seems incorrect" 
 repo_name_correct "$DOCKER_IMAGE" "dockerhub" || fail "repo name '$DOCKER_IMAGE' seems incorrect"
 
-repo_url="https://github.com/$GITHUB_REPO.git"
-
 # Clone repository
+repo_url="https://github.com/$GITHUB_REPO.git"
 output="$(git clone -q $repo_url $TEMP_DIR 2>&1)"
 [ "$?" -eq 0 ] || fail "'git clone $repo_url': $output"
 
