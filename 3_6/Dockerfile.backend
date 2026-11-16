@@ -1,0 +1,20 @@
+FROM golang:1.16
+
+WORKDIR = /usr/src/app
+
+ENV PORT=8080
+
+EXPOSE $PORT
+
+ENV REQUEST_ORIGIN=http://localhost:5001
+
+COPY code/example-backend ./
+
+RUN go mod download &&  go version && \ 
+    go build -v && \ 
+    useradd -m appuser && chown appuser . && \
+    rm -rf cache/ 
+
+USER appuser
+
+ENTRYPOINT ["./server"]
