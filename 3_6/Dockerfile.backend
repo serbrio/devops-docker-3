@@ -17,4 +17,5 @@ RUN go mod download &&  go version && \
 
 USER appuser
 
-ENTRYPOINT ["./server"]
+# ENTRYPOINT ["./server"]
+CMD ["./server"]
