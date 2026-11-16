@@ -1,0 +1,23 @@
+FROM golang:1.16
+
+WORKDIR = /usr/src/app
+
+ENV PORT=8080
+
+EXPOSE $PORT
+
+COPY code/example-backend ./
+
+RUN go mod download
+
+RUN go version
+
+RUN go build -v
+
+RUN useradd -m appuser
+
+RUN chown appuser .
+
+USER appuser
+
+ENTRYPOINT ["./server"]
