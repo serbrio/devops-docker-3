@@ -1,0 +1,21 @@
+FROM node:16.20.2-alpine3.18
+
+EXPOSE 5001
+
+ENV REACT_APP_BACKEND_URL=http://localhost:8080
+
+WORKDIR /usr/src/app
+
+COPY code/example-frontend .
+
+RUN apk add --no-cache ca-certificates && \
+    node -v && npm -v && \
+    npm install && npm install -g serve && \
+    npm run build && \
+    rm -rf src/ && \
+    adduser -D appuser && chown appuser .
+
+USER appuser
+
+# ENTRYPOINT ["serve", "-s", "-l", "5001", "build"]
+CMD ["serve", "-s", "-l", "5001", "build"]
