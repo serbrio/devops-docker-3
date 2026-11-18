@@ -1,0 +1,22 @@
+FROM golang:alpine AS build-stage
+
+WORKDIR /usr/src/app
+
+ENV REQUEST_ORIGIN=http://localhost:5001
+
+COPY code/example-backend ./
+
+RUN go mod download && go build -v  
+
+FROM scratch
+
+COPY --from=build-stage /usr/src/app/server /server
+
+# RUN adduser -D appuser
+
+# USER appuser
+
+EXPOSE 8080
+
+# ENTRYPOINT ["./server"]
+CMD ["./server"]
