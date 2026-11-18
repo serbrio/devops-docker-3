@@ -16,6 +16,8 @@ COPY --from=build-stage /usr/src/app/server /server
 
 # USER appuser
 
+ENV REQUEST_ORIGIN=http://localhost:5001
+
 EXPOSE 8080
 
 # ENTRYPOINT ["./server"]
